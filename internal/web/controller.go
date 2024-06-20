@@ -3,6 +3,7 @@ package web
 import (
 	"log"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -13,7 +14,7 @@ func WebServer(wg *sync.WaitGroup) {
 
 	http.HandleFunc("/api/setAllDaysToDefaultState", updateDays)
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(os.Getenv("PORT"), nil); err != nil {
 		log.Default().Println(err)
 	}
 }
