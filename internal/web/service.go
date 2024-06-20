@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	cofig "elerphore.com/flower-journal/internal/config"
 	"elerphore.com/flower-journal/internal/mongo"
 	"elerphore.com/flower-journal/internal/telegram"
-	telegram_config "elerphore.com/flower-journal/internal/telegramm_config"
 )
 
 func executeScheduling(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +19,7 @@ func executeScheduling(w http.ResponseWriter, r *http.Request) {
 		if !day.Used {
 			telegram.DeleteMessages(user.Telegram_Chat_ID)
 
-			var request = telegram_config.NewSendMessage(users[index])
+			var request = cofig.NewSendMessage(users[index])
 			telegram.SendMessage(request)
 		} else {
 			log.Default().Println("User:", user.ID, "already did it")

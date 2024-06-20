@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"log"
 
+	config "elerphore.com/flower-journal/internal/config"
 	"elerphore.com/flower-journal/internal/mongo"
-	telegram_config "elerphore.com/flower-journal/internal/telegramm_config"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func SendMessage(request telegram_config.SendMessageConfig) {
+func SendMessage(request config.SendMessageConfig) {
 
 	params, _ := request.Params()
 	response, err := telegramm_bot.MakeRequest(request.Method(), params)
@@ -55,7 +55,7 @@ func DeleteMessages(chatid int64) {
 	messages := mongo.GetMessagesById(chatid)
 
 	for _, item := range messages {
-		deleteMessageConfig := telegram_config.DeleteMessageConfig{
+		deleteMessageConfig := config.DeleteMessageConfig{
 			ChatID:    item.ChatID,
 			MessageID: item.MessageId,
 		}
