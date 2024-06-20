@@ -1,7 +1,5 @@
 package main
 
-// 7314449266:AAFl490U2NEHvLuWopDJ4SxLD1cxek6asiU
-
 import (
 	"log"
 	"sync"

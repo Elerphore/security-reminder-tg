@@ -20,10 +20,3 @@ func (config DeleteMessageConfig) Params() (tgbotapi.Params, error) {
 
 	return params, nil
 }
-
-func NewDeleteMessage() DeleteMessageConfig {
-	return DeleteMessageConfig{
-		ChatID:    735391827,
-		MessageID: 735391827,
-	}
-}
