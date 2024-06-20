@@ -19,11 +19,9 @@ func InsertNewUser(user User) {
 	ctx := context.Background()
 	user_collection := client.Database("main").Collection("user")
 
-	var found_user User
+	result := user_collection.FindOne(ctx, bson.D{{Key: "telegram_user_id", Value: user.Telegram_User_ID}})
 
-	err := user_collection.FindOne(ctx, bson.D{{Key: "telegram_id", Value: user.Telegram_User_ID}}).Decode(&found_user)
-
-	if err != nil {
+	if result.Err() != nil {
 		days_collection := client.Database("main").Collection("days")
 		res, err := user_collection.InsertOne(ctx, user)
 
@@ -43,12 +41,10 @@ func InsertNewUser(user User) {
 		days_collection.InsertMany(ctx, days)
 
 		if err != nil {
-			panic(err)
+			log.Default().Println(err)
 		}
 
 		defaultLog.Println("New User added: {}", res)
-	} else {
-		defaultLog.Println("User already exists")
 	}
 
 }
