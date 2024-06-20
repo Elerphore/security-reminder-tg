@@ -9,7 +9,7 @@ import (
 )
 
 type User struct {
-	ID               primitive.ObjectID `bson:"_id"`
+	ID               primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	Telegram_User_ID int64
 	Telegram_Chat_ID int64
 	Send_Time        string
@@ -24,6 +24,10 @@ func InsertNewUser(user User) {
 	if result.Err() != nil {
 		days_collection := client.Database("main").Collection("days")
 		res, err := user_collection.InsertOne(ctx, user)
+
+		if err != nil {
+			log.Default().Println(err)
+		}
 
 		user_id := res.InsertedID.(primitive.ObjectID)
 

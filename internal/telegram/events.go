@@ -5,6 +5,7 @@ import (
 
 	"elerphore.com/flower-journal/internal/mongo"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func listenToUpdates() {
@@ -76,6 +77,7 @@ func callBackQueryHandle(update tgbotapi.Update) {
 func insertNewUser(update tgbotapi.Update) {
 
 	var user = mongo.User{
+		ID:               primitive.NewObjectID(),
 		Telegram_User_ID: update.SentFrom().ID,
 		Telegram_Chat_ID: update.FromChat().ID,
 		Send_Time:        "18:30",
