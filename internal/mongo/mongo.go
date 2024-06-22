@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"log"
+	"os"
 	"sync"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,7 +20,11 @@ func MongoDBConncetion(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	ctx := context.WithoutCancel(context.Background())
-	cl, _ := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	cl, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_DB_URI")))
+
+	if err != nil {
+		log.Default().Fatalln(err)
+	}
 
 	client = cl
 }

@@ -12,6 +12,8 @@ import (
 func executeScheduling(w http.ResponseWriter, r *http.Request) {
 	users := mongo.GetUsers()
 
+	log.Default().Println("Users count:", len(users))
+
 	for index, user := range users {
 
 		day := mongo.FindCurrentDayByUserId(user.ID)

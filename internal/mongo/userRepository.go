@@ -56,6 +56,7 @@ func InsertNewUser(user User) {
 func GetUsers() []User {
 	ctx := context.Background()
 	user_collection := client.Database("main").Collection("user")
+
 	users_cursor, err := user_collection.Find(ctx, bson.D{})
 
 	var users []User
