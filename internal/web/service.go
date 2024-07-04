@@ -1,30 +1,32 @@
 package web
 
 import (
-	"log"
 	"net/http"
+	"os"
 
-	cofig "elerphore.com/flower-journal/internal/config"
 	"elerphore.com/flower-journal/internal/mongo"
 	"elerphore.com/flower-journal/internal/telegram"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func executeScheduling(w http.ResponseWriter, r *http.Request) {
 	users := mongo.GetUsers()
 
-	log.Default().Println("Users count:", len(users))
-
-	for index, user := range users {
+	for _, user := range users {
 
 		day := mongo.FindCurrentDayByUserId(user.ID)
 
 		if !day.Used {
-			telegram.DeleteMessages(user.Telegram_Chat_ID)
+			msg := tgbotapi.NewMessage(user.Telegram_Chat_ID, os.Getenv("QUESTION_TO_ASK"))
 
-			var request = cofig.NewSendMessage(users[index])
-			telegram.SendMessage(request)
-		} else {
-			log.Default().Println("User:", user.ID, "already did it")
+			msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+				tgbotapi.NewInlineKeyboardRow(
+					tgbotapi.NewInlineKeyboardButtonData("Да", "1"),
+					tgbotapi.NewInlineKeyboardButtonData("Нет", "2"),
+				))
+
+			resp := telegram.SendMessageNative(msg)
+			mongo.UpdateUserMessageID(user.ID, resp.MessageID)
 		}
 	}
 }

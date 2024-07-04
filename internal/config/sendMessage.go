@@ -1,9 +1,6 @@
 package telegram_config
 
 import (
-	"os"
-
-	"elerphore.com/flower-journal/internal/mongo"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -25,10 +22,10 @@ func (config SendMessageConfig) Method() string {
 	return "sendMessage"
 }
 
-func NewSendMessage(telegram_user mongo.User) SendMessageConfig {
+func NewSendMessage(chat_id int64, text string) SendMessageConfig {
 	return SendMessageConfig{
-		ChatID: telegram_user.Telegram_Chat_ID,
-		Text:   os.Getenv("QUESTION_TO_ASK"),
+		ChatID: chat_id,
+		Text:   text,
 		ReplyMarkup: tgbotapi.NewInlineKeyboardMarkup(
 			tgbotapi.NewInlineKeyboardRow(
 				tgbotapi.NewInlineKeyboardButtonData("Да", "1"),

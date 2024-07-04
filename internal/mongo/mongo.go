@@ -11,7 +11,11 @@ import (
 )
 
 var (
-	client *mongo.Client
+	client              *mongo.Client
+	user_collection     *mongo.Collection
+	days_collection     *mongo.Collection
+	messages_collection *mongo.Collection
+	ctx                 = context.Background()
 )
 
 var defaultLog = log.Default()
@@ -27,4 +31,8 @@ func MongoDBConncetion(wg *sync.WaitGroup) {
 	}
 
 	client = cl
+
+	user_collection = client.Database("main").Collection("user")
+	days_collection = client.Database("main").Collection("days")
+	messages_collection = client.Database("main").Collection("messages")
 }

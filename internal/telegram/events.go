@@ -3,9 +3,9 @@ package telegram
 import (
 	"log"
 
+	"elerphore.com/flower-journal/internal/http_client"
 	"elerphore.com/flower-journal/internal/mongo"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func listenToUpdates() {
@@ -36,21 +36,19 @@ func commandHandle(update tgbotapi.Update) {
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 
-	switch update.Message.Command() {
-	case "start":
-		msg.Text = "Вы зарегестрированы в системе!"
-		insertNewUser(update)
-	default:
-		msg.Text = "It's not going to work :)"
+	command := update.Message.Command()
+
+	if command == "start" {
+		onCommand(msg, update)
 	}
 
-	SendMessageNative(msg)
+	if command != "start" {
+		onUnknown(msg)
+	}
+
 }
 
 func callBackQueryHandle(update tgbotapi.Update) {
-
-	DeleteMessages(update.FromChat().ID)
-
 	callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
 
 	if _, err := telegramm_bot.Request(callback); err != nil {
@@ -59,29 +57,19 @@ func callBackQueryHandle(update tgbotapi.Update) {
 
 	var resp string
 
+	user := mongo.GetUserByTelegramUserId(update.CallbackQuery.From.ID)
+
 	if update.CallbackQuery.Data == "1" {
-		user := mongo.GetUserByTelegramUserId(update.CallbackQuery.From.ID)
+
 		mongo.UpdateCurrentDay(user.ID)
 		resp = "Умница!"
 	}
 
 	if update.CallbackQuery.Data == "2" {
-		resp = "Если бы я имплементировал сюда андектоты, то ты бы получила один, 100%!"
+		resp = "Анекдот: " + http_client.GetJoke().Joke
 	}
 
-	msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, resp)
+	msg := tgbotapi.NewEditMessageText(user.Telegram_Chat_ID, user.Telegram_Message_ID, resp)
 
-	SendMessageNative(msg)
-}
-
-func insertNewUser(update tgbotapi.Update) {
-
-	var user = mongo.User{
-		ID:               primitive.NewObjectID(),
-		Telegram_User_ID: update.SentFrom().ID,
-		Telegram_Chat_ID: update.FromChat().ID,
-		Send_Time:        "18:30",
-	}
-
-	mongo.InsertNewUser(user)
+	telegramm_bot.Send(msg)
 }

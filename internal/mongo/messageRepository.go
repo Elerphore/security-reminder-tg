@@ -1,9 +1,9 @@
 package mongo
 
 import (
-	"context"
 	"log"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -18,10 +18,15 @@ type Message struct {
 	Deleted   bool
 }
 
-func InsertNewMessage(message Message) {
-	ctx := context.Background()
-	messages := client.Database("main").Collection("messages")
-	res, err := messages.InsertOne(ctx, message)
+func InsertNewMessage(resp tgbotapi.Message) {
+
+	message := Message{
+		MessageId: resp.MessageID,
+		ChatID:    resp.Chat.ID,
+		Deleted:   false,
+	}
+
+	res, err := messages_collection.InsertOne(ctx, message)
 
 	if err != nil {
 		log.Default().Println(err)
@@ -31,9 +36,7 @@ func InsertNewMessage(message Message) {
 }
 
 func UpdateMessage() {
-	ctx := context.Background()
-	messages := client.Database("main").Collection("messages")
-	messages_cursor, err := messages.Find(ctx, bson.D{})
+	messages_cursor, err := messages_collection.Find(ctx, bson.D{})
 
 	if err != nil {
 		log.Fatalln(err)
@@ -51,9 +54,7 @@ func UpdateMessage() {
 }
 
 func GetMessages() []Message {
-	ctx := context.Background()
-	messages := client.Database("main").Collection("messages")
-	messages_cursor, err := messages.Find(ctx, bson.D{})
+	messages_cursor, err := messages_collection.Find(ctx, bson.D{})
 
 	if err != nil {
 		log.Fatalln(err)
@@ -71,9 +72,7 @@ func GetMessages() []Message {
 }
 
 func GetMessagesById(chatid int64) []Message {
-	ctx := context.Background()
-	messages := client.Database("main").Collection("messages")
-	messages_cursor, err := messages.Find(ctx, bson.D{{"chatid", chatid}})
+	messages_cursor, err := messages_collection.Find(ctx, bson.D{{Key: "chatid", Value: chatid}})
 
 	if err != nil {
 		log.Fatalln(err)
@@ -91,9 +90,7 @@ func GetMessagesById(chatid int64) []Message {
 }
 
 func UpdateMessagesByChatID(chatid int64, update primitive.D) {
-	ctx := context.Background()
-	messages := client.Database("main").Collection("messages")
-	result, err := messages.UpdateMany(ctx, bson.D{{"chatid", chatid}}, update)
+	result, err := messages_collection.UpdateMany(ctx, bson.D{{Key: "chatid", Value: chatid}}, update)
 
 	if err != nil {
 		log.Default().Println(err)

@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"context"
 	"log"
 	"time"
 
@@ -16,10 +15,7 @@ type Day struct {
 }
 
 func SetAllDaysToDefaultState() {
-	ctx := context.Background()
-	daysCollection := client.Database("main").Collection("days")
-
-	res, err := daysCollection.UpdateMany(
+	res, err := days_collection.UpdateMany(
 		ctx,
 		bson.D{},
 		bson.D{
@@ -43,12 +39,9 @@ func SetAllDaysToDefaultState() {
 }
 
 func FindCurrentDayByUserId(userID primitive.ObjectID) Day {
-	ctx := context.Background()
-	daysCollection := client.Database("main").Collection("days")
-
 	var day Day
 
-	err := daysCollection.FindOne(
+	err := days_collection.FindOne(
 		ctx,
 		bson.D{
 			{
@@ -70,10 +63,7 @@ func FindCurrentDayByUserId(userID primitive.ObjectID) Day {
 }
 
 func UpdateCurrentDay(userID primitive.ObjectID) {
-	ctx := context.Background()
-	daysCollection := client.Database("main").Collection("days")
-
-	err := daysCollection.FindOneAndUpdate(
+	err := days_collection.FindOneAndUpdate(
 		ctx,
 		bson.D{
 			{
